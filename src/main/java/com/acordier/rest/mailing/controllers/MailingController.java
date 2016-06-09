@@ -37,14 +37,13 @@ public class MailingController {
 			try {
 				mailingService.sendMail(deserialize(message), file);
 			} catch (JsonParseException e) {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("bad json string format");
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("bad json string format: " + e.getLocalizedMessage());
 			} catch (JsonMappingException e) {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("unable to deserialize json string");
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("unable to deserialize json string: " + e.getLocalizedMessage());
 			} catch (MessagingException e) {
-				return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body("unable to send message");
+				return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body("unable to send message: " + e.getLocalizedMessage());
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("attachment error: " + e.getLocalizedMessage());
 			}
 			return ResponseEntity.status(HttpStatus.CREATED).body("mail sent");
 
@@ -55,7 +54,7 @@ public class MailingController {
 			try {
 				mailingService.sendMail(message);
 			} catch (MessagingException e) {
-				return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body("unable to send message");
+				return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body("unable to send message: " + e.getLocalizedMessage());
 			}
 			return ResponseEntity.status(HttpStatus.CREATED).body("mail sent");
 	}
