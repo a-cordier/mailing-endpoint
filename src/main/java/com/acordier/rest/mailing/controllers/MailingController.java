@@ -2,6 +2,8 @@ package com.acordier.rest.mailing.controllers;
 
 import java.io.IOException;
 
+import javax.mail.MessagingException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,23 +33,31 @@ public class MailingController {
 	public ResponseEntity<String> sendMailWithAttachment(@RequestPart("message") String message,
 			@RequestPart("file") MultipartFile file) {
 		logger.info(message);
-		try {
-			
-			mailingService.sendMail(deserialize(message), file);
+
+			try {
+				mailingService.sendMail(deserialize(message), file);
+			} catch (JsonParseException e) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("bad json string format");
+			} catch (JsonMappingException e) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("unable to deserialize json string");
+			} catch (MessagingException e) {
+				return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body("unable to send message");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			return ResponseEntity.status(HttpStatus.CREATED).body("mail sent");
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(e.getMessage());
-		}
+
 	}
 
 	@RequestMapping(method = RequestMethod.POST, consumes = { "application/json" })
 	public ResponseEntity<String> sendSimpleMail(@RequestBody MailMessage message) {
-		try {
-			mailingService.sendMail(message);
+			try {
+				mailingService.sendMail(message);
+			} catch (MessagingException e) {
+				return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body("unable to send message");
+			}
 			return ResponseEntity.status(HttpStatus.CREATED).body("mail sent");
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(e.getMessage());
-		}
 	}
 	
 	private MailMessage deserialize(String jsonString) throws JsonParseException, JsonMappingException, IOException{

@@ -20,7 +20,7 @@ public class MailingService {
 	private JavaMailSender javaMailSender;
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
-	public void sendMail(MailMessage message) throws Exception {
+	public void sendMail(MailMessage message) throws MessagingException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         try {
 			MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
@@ -36,7 +36,7 @@ public class MailingService {
 
 	}
 	
-	public void sendMail(MailMessage message, MultipartFile file) throws Exception {
+	public void sendMail(MailMessage message, MultipartFile file) throws MessagingException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         try {
 			MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
