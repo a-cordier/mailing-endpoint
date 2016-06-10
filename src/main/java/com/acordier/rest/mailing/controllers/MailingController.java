@@ -31,11 +31,11 @@ public class MailingController {
 
 	@RequestMapping(method = RequestMethod.POST, consumes = { "multipart/form-data" })
 	public ResponseEntity<String> sendMailWithAttachment(@RequestPart("message") String message,
-			@RequestPart("file") MultipartFile file) {
+			@RequestPart("file") MultipartFile[] files) {
 		logger.info(message);
 
 			try {
-				mailingService.sendMail(deserialize(message), file);
+				mailingService.sendMail(deserialize(message), files);
 			} catch (JsonParseException e) {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("bad json string format: " + e.getLocalizedMessage());
 			} catch (JsonMappingException e) {

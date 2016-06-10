@@ -36,7 +36,7 @@ public class MailingService {
 
 	}
 	
-	public void sendMail(MailMessage message, MultipartFile file) throws MessagingException {
+	public void sendMail(MailMessage message, MultipartFile[] files) throws MessagingException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         try {
 			MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
@@ -44,7 +44,8 @@ public class MailingService {
 			mimeMessageHelper.setTo(message.getTo());
 			mimeMessageHelper.setSubject(message.getSubject());
 			mimeMessageHelper.setText(message.getContent());
-			mimeMessageHelper.addAttachment(file.getOriginalFilename(), file);
+			for(MultipartFile file: files)
+				mimeMessageHelper.addAttachment(file.getOriginalFilename(), file);
 			javaMailSender.send(mimeMessage);
 		} catch (MessagingException e) {
 			logger.error("error sending message: " + e.getMessage());
